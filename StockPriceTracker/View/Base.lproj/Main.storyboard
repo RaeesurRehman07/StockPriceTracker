@@ -16,27 +16,78 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sfF-x2-8kz" userLabel="ConnectionContainer">
+                                <rect key="frame" x="20" y="192" width="353" height="50"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IlQ-YR-ELD" userLabel="ConnectionStatusView">
+                                        <rect key="frame" x="10" y="20" width="10" height="10"/>
+                                        <color key="backgroundColor" systemColor="systemGreenColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="10" id="keF-ni-Uby"/>
+                                            <constraint firstAttribute="height" constant="10" id="uXL-Sg-hDP"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="5"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fk1-ar-VIc" userLabel="ConnectionStatus">
+                                        <rect key="frame" x="30" y="14.666666666666657" width="42" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8ms-eX-1IW">
+                                        <rect key="frame" x="323" y="15" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="qFQ-q4-k8E"/>
+                                            <constraint firstAttribute="height" constant="20" id="qbS-Jp-IUS"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="systemGray2Color"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="play.fill" catalog="system"/>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="fk1-ar-VIc" firstAttribute="centerY" secondItem="IlQ-YR-ELD" secondAttribute="centerY" id="6cg-LB-4Bn"/>
+                                    <constraint firstItem="fk1-ar-VIc" firstAttribute="leading" secondItem="IlQ-YR-ELD" secondAttribute="trailing" constant="10" id="OZV-Pm-YEy"/>
+                                    <constraint firstAttribute="trailing" secondItem="8ms-eX-1IW" secondAttribute="trailing" constant="10" id="W9d-aH-ymt"/>
+                                    <constraint firstItem="8ms-eX-1IW" firstAttribute="centerY" secondItem="sfF-x2-8kz" secondAttribute="centerY" id="doQ-oz-gvr"/>
+                                    <constraint firstItem="IlQ-YR-ELD" firstAttribute="leading" secondItem="sfF-x2-8kz" secondAttribute="leading" constant="10" id="w3h-x2-a5e"/>
+                                    <constraint firstAttribute="height" constant="50" id="xrp-Bk-8yK"/>
+                                    <constraint firstItem="IlQ-YR-ELD" firstAttribute="centerY" secondItem="sfF-x2-8kz" secondAttribute="centerY" id="yuU-qH-aAS"/>
+                                </constraints>
+                            </view>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="gFS-mN-J9j">
-                                <rect key="frame" x="20" y="192" width="353" height="32"/>
+                                <rect key="frame" x="20" y="262" width="353" height="32"/>
                                 <segments>
                                     <segment title="Price"/>
                                     <segment title="Change"/>
                                 </segments>
                             </segmentedControl>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="vOJ-YK-AOQ">
-                                <rect key="frame" x="20" y="243" width="353" height="521"/>
+                                <rect key="frame" x="20" y="313" width="353" height="451"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="gyW-Dt-yxD"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="wNZ-C7-NXU"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="gFS-mN-J9j" firstAttribute="top" secondItem="sfF-x2-8kz" secondAttribute="bottom" constant="20" id="3Xi-8P-BIK"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="vOJ-YK-AOQ" secondAttribute="trailing" constant="20" id="5Ac-ER-mZZ"/>
                             <constraint firstItem="vOJ-YK-AOQ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="9MM-r5-SJf"/>
                             <constraint firstItem="gFS-mN-J9j" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="DUE-VC-nJh"/>
+                            <constraint firstItem="sfF-x2-8kz" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="f9e-kN-BkN"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gFS-mN-J9j" secondAttribute="trailing" constant="20" id="gGL-R5-ZdD"/>
-                            <constraint firstItem="gFS-mN-J9j" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="ggz-TQ-8Bq"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="sfF-x2-8kz" secondAttribute="trailing" constant="20" id="lOb-sw-gNF"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="vOJ-YK-AOQ" secondAttribute="bottom" constant="20" id="nfX-hX-d4L"/>
+                            <constraint firstItem="sfF-x2-8kz" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="wkx-vm-2pB"/>
                             <constraint firstItem="vOJ-YK-AOQ" firstAttribute="top" secondItem="gFS-mN-J9j" secondAttribute="bottom" constant="20" id="yye-qn-H6N"/>
                         </constraints>
                     </view>
@@ -44,6 +95,10 @@
                         <nil key="title"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="connectionButton" destination="8ms-eX-1IW" id="GBn-Rc-6QE"/>
+                        <outlet property="connectionIndicatorView" destination="IlQ-YR-ELD" id="Buh-U1-RRf"/>
+                        <outlet property="connectionStatusContainer" destination="sfF-x2-8kz" id="lkR-4E-xzI"/>
+                        <outlet property="connectionStatusLabel" destination="fk1-ar-VIc" id="YjI-bz-6qo"/>
                         <outlet property="contentTableView" destination="vOJ-YK-AOQ" id="KES-XP-RFD"/>
                         <outlet property="sortControl" destination="gFS-mN-J9j" id="1Or-DA-E0d"/>
                     </connections>
@@ -72,8 +127,15 @@
         </scene>
     </scenes>
     <resources>
+        <image name="play.fill" catalog="system" width="120" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray2Color">
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

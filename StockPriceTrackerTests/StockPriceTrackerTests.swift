@@ -10,15 +10,24 @@ import XCTest
 
 final class StockPriceTrackerTests: XCTestCase {
 
+    // MARK: - StockSymbols - 
+
+    func testStockSymbols_hasTwentyFiveUniqueTrackedSymbols() {
+        XCTAssertEqual(StockSymbols.count, 25)
+        XCTAssertEqual(StockSymbols.tracked.count, 25)
+        XCTAssertEqual(Set(StockSymbols.all).count, 25)
+    }
+
     // MARK: - SymbolsListViewModel - 
 
-    func testSymbolsListViewModel_hasDummyItems() {
+    func testSymbolsListViewModel_rowCountMatchesTrackedSymbols() {
         let viewModel = SymbolsListViewModel()
 
-        XCTAssertEqual(viewModel.numberOfRows, 3)
+        XCTAssertEqual(viewModel.numberOfRows, StockSymbols.count)
 
         let first = viewModel.item(at: 0)
-        XCTAssertEqual(first.title, "AAPL")
+        XCTAssertFalse(first.title.isEmpty)
+        XCTAssertTrue(StockSymbols.tracked.contains(first.title))
     }
 
     func testSymbolsListViewModel_changesSortMode() {
