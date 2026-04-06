@@ -139,4 +139,16 @@ extension SymbolsListViewController: UITableViewDataSource, UITableViewDelegate 
         cell.accessoryType = .disclosureIndicator
         return cell
     }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let item = viewModel.item(at: indexPath.row)
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let detail = storyboard.instantiateViewController(withIdentifier: "SymbolDetailViewController") as? SymbolDetailViewController else {
+            return
+        }
+        detail.symbol = item.title
+        detail.listViewModel = viewModel
+        navigationController?.pushViewController(detail, animated: true)
+    }
 }

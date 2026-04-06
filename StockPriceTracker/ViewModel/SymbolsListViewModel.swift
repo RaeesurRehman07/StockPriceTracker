@@ -1,5 +1,11 @@
 import Foundation
 
+// MARK: - Notification.Name - 
+
+extension Notification.Name {
+    static let stockPricesDidUpdate = Notification.Name("StockPriceTracker.stockPricesDidUpdate")
+}
+
 // MARK: - SymbolsListQuote - 
 
 struct SymbolsListQuote {
@@ -104,6 +110,12 @@ final class SymbolsListViewModel {
         onUpdate?()
     }
 
+    /// Latest quote for a symbol (e.g. symbol detail screen).
+    func quote(for symbol: String) -> SymbolsListQuote? {
+        guard let entry = prices[symbol] else { return nil }
+        return SymbolsListQuote(price: entry.price, change: entry.change)
+    }
+
     // MARK: - Helpers - 
 
     private func currentSymbolsOrder() -> [String] {
@@ -156,7 +168,9 @@ extension SymbolsListViewModel: WebSocketManagerDelegate {
         prices[symbol] = entry
 
         DispatchQueue.main.async { [weak self] in
-            self?.onUpdate?()
+            guard let self = self else { return }
+            self.onUpdate?()
+            NotificationCenter.default.post(name: .stockPricesDidUpdate, object: self)
         }
     }
 }

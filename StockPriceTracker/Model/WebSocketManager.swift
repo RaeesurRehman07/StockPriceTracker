@@ -18,9 +18,14 @@ final class WebSocketManager {
     private let session: URLSession
     private var didNotifyConnected = false
 
+    private var connectionDesired = false
+
+    private var reconnectAttempt = 0
+    private var pendingReconnect: DispatchWorkItem?
+
     /// Sends one random price per symbol on each tick, echoed back by the server.
     private var liveSendTimer: Timer?
-    private let liveTickInterval: TimeInterval = 10.0
+    private let liveTickInterval: TimeInterval = 5.0
 
     // MARK: - Initializer - 
 
@@ -30,27 +35,25 @@ final class WebSocketManager {
 
     deinit {
         stopLivePriceFeed()
+        pendingReconnect?.cancel()
     }
 
     // MARK: - Public API - 
 
     func connect() {
-        guard webSocketTask == nil else { return }
-        guard let url = URL(string: "wss://ws.postman-echo.com/raw") else { return }
-
-        didNotifyConnected = false
-        webSocketTask = session.webSocketTask(with: url)
-        webSocketTask?.resume()
-
-        receiveMessage()
-
-        // Wake the echo path so the first receive can mark us connected.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.sendRandomPriceMessage()
-        }
+        connectionDesired = true
+        reconnectAttempt = 0
+        pendingReconnect?.cancel()
+        pendingReconnect = nil
+        openSocketIfNeeded()
     }
 
     func disconnect() {
+        connectionDesired = false
+        reconnectAttempt = 0
+        pendingReconnect?.cancel()
+        pendingReconnect = nil
+
         stopLivePriceFeed()
         webSocketTask?.cancel(with: .goingAway, reason: nil)
         webSocketTask = nil
@@ -64,15 +67,61 @@ final class WebSocketManager {
 
     func send(message: String) {
         let payload = URLSessionWebSocketTask.Message.string(message)
-        webSocketTask?.send(payload) { error in
+        webSocketTask?.send(payload) { [weak self] error in
+            guard let self = self else { return }
             if let error = error {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.stopLivePriceFeed()
-                    self.delegate?.webSocketManagerDidDisconnect(self, error: error)
+                DispatchQueue.main.async {
+                    self.handleConnectionLoss(error: error)
                 }
             }
         }
+    }
+
+    // MARK: - Socket lifecycle - 
+
+    private func openSocketIfNeeded() {
+        guard connectionDesired else { return }
+        guard webSocketTask == nil else { return }
+        guard let url = URL(string: "wss://ws.postman-echo.com/raw") else { return }
+
+        didNotifyConnected = false
+        webSocketTask = session.webSocketTask(with: url)
+        webSocketTask?.resume()
+
+        receiveMessage()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.sendRandomPriceMessage()
+        }
+    }
+
+    private func handleConnectionLoss(error: Error?) {
+        stopLivePriceFeed()
+        webSocketTask?.cancel(with: .goingAway, reason: nil)
+        webSocketTask = nil
+        didNotifyConnected = false
+
+        guard connectionDesired else {
+            delegate?.webSocketManagerDidDisconnect(self, error: error)
+            return
+        }
+
+        scheduleReconnect()
+    }
+
+    private func scheduleReconnect() {
+        guard connectionDesired else { return }
+
+        reconnectAttempt += 1
+        let delay = min(30.0, pow(2.0, Double(min(reconnectAttempt, 5))))
+
+        pendingReconnect?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.openSocketIfNeeded()
+        }
+        pendingReconnect = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 
     // MARK: - Live feed - 
@@ -117,17 +166,17 @@ final class WebSocketManager {
             switch result {
             case .failure(let error):
                 DispatchQueue.main.async {
-                    self.stopLivePriceFeed()
-                    self.delegate?.webSocketManagerDidDisconnect(self, error: error)
+                    self.handleConnectionLoss(error: error)
                 }
-                self.webSocketTask = nil
-                self.didNotifyConnected = false
 
             case .success(let message):
                 switch message {
                 case .string(let text):
                     if !self.didNotifyConnected {
                         self.didNotifyConnected = true
+                        self.reconnectAttempt = 0
+                        self.pendingReconnect?.cancel()
+                        self.pendingReconnect = nil
                         DispatchQueue.main.async {
                             self.delegate?.webSocketManagerDidConnect(self)
                             self.startLivePriceFeed()
@@ -141,6 +190,9 @@ final class WebSocketManager {
                     if let text = String(data: data, encoding: .utf8) {
                         if !self.didNotifyConnected {
                             self.didNotifyConnected = true
+                            self.reconnectAttempt = 0
+                            self.pendingReconnect?.cancel()
+                            self.pendingReconnect = nil
                             DispatchQueue.main.async {
                                 self.delegate?.webSocketManagerDidConnect(self)
                                 self.startLivePriceFeed()
