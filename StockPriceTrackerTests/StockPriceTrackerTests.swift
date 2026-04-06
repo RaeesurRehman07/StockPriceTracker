@@ -41,5 +41,23 @@ final class StockPriceTrackerTests: XCTestCase {
         viewModel.sortByPrice()
         XCTAssertEqual(viewModel.sortMode, .price)
     }
+
+    // MARK: - PriceFeedMessageParser - 
+
+    func testPriceFeedMessageParser_validTrackedSymbol() {
+        let parsed = PriceFeedMessageParser.parse("AAPL:180.5")
+        XCTAssertEqual(parsed?.symbol, "AAPL")
+        XCTAssertEqual(parsed?.price, 180.5)
+    }
+
+    func testPriceFeedMessageParser_invalidFormat() {
+        XCTAssertNil(PriceFeedMessageParser.parse("no-colon"))
+        XCTAssertNil(PriceFeedMessageParser.parse("AAPL:notANumber"))
+        XCTAssertNil(PriceFeedMessageParser.parse("AAPL"))
+    }
+
+    func testPriceFeedMessageParser_untrackedSymbol() {
+        XCTAssertNil(PriceFeedMessageParser.parse("ZZZZ:100"))
+    }
 }
 

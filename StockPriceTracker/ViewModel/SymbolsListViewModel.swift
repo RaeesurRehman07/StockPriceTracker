@@ -152,14 +152,10 @@ extension SymbolsListViewModel: WebSocketManagerDelegate {
     }
 
     func webSocketManager(_ manager: WebSocketManager, didReceiveText message: String) {
-        let components = message.split(separator: ":")
-        guard components.count == 2,
-              let price = Double(components[1]) else {
-            return
-        }
+        guard let parsed = PriceFeedMessageParser.parse(message) else { return }
 
-        let symbol = String(components[0])
-        guard StockSymbols.tracked.contains(symbol) else { return }
+        let symbol = parsed.symbol
+        let price = parsed.price
 
         let previousPrice = prices[symbol]?.price ?? price
         let change = price - previousPrice
