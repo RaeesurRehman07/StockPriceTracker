@@ -2,6 +2,8 @@
 
 Real-time stock list (Postman Echo WebSocket) with MVVM-style layering, symbol detail, sorting, and connection controls.
 
+Requirements: Xcode 16 or later. The `.xcodeproj` uses `objectVersion` 77; Xcode 15.x cannot open it (*future Xcode project file format*).
+
 ## Architecture (concise)
 
 | Layer | Role |
@@ -20,12 +22,28 @@ Real-time stock list (Postman Echo WebSocket) with MVVM-style layering, symbol d
 
 ## CI
 
-From the repo root:
+From the repo root. **`xcodebuild test` needs a concrete simulator** (`generic/platform=iOS Simulator` is not enough).
 
-```bash
-xcodebuild test -scheme StockPriceTracker -destination 'generic/platform=iOS Simulator' -only-testing:StockPriceTrackerTests
-```
+1. List destinations your Xcode actually has (names change with Xcode/iOS SDK — e.g. newer kits may offer **iPhone 17** but not **iPhone 16**):
 
-Or pick a named simulator (e.g. iPhone 16) if you prefer.
+   ```bash
+   xcodebuild -scheme StockPriceTracker -showdestinations
+   ```
 
-GitHub Actions: see `.github/workflows/ci.yml`.
+2. Copy `name=` and `OS=` from a line under **Available destinations** (pick any **iOS Simulator** row, e.g. `iPhone 17` @ `26.4`).
+
+3. Run tests:
+
+   ```bash
+   xcodebuild test \
+     -scheme StockPriceTracker \
+     -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+     -only-testing:StockPriceTrackerTests \
+     CODE_SIGN_IDENTITY="" \
+     CODE_SIGNING_REQUIRED=NO \
+     CODE_SIGNING_ALLOWED=NO
+   ```
+
+   Adjust `name=` / `OS=` to match step 1. Using `OS=latest` works when that device type exists.
+
+GitHub Actions (`.github/workflows/ci.yml`) pins a simulator name that matches the **CI** Xcode image; locally, always align with **your** `-showdestinations` list.
