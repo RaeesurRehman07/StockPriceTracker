@@ -2,6 +2,8 @@
 
 Real-time stock list (Postman Echo WebSocket) with MVVM-style layering, symbol detail, sorting, and connection controls.
 
+Requirements: Xcode 16 or later. The `.xcodeproj` uses `objectVersion` 77; Xcode 15.x cannot open it (*future Xcode project file format*).
+
 ## Architecture (concise)
 
 | Layer | Role |

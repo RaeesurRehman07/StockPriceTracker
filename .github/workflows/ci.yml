@@ -13,6 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Project uses objectVersion 77 (Xcode 16). Xcode 15.x cannot open this format.
+      - name: Select Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16"
+
       - name: Run unit tests
         run: |
           xcodebuild test \
